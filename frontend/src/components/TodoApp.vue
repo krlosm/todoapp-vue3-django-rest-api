@@ -16,15 +16,17 @@ export default {
       const todos = ref([])
       provide('todos', todos)
 
-      if (localStorage.getItem('todos')) {
-          todos.value = JSON.parse(localStorage.getItem('todos'))
+      async function loadData() {
+        const response = await fetch('http://127.0.0.1:8000/api/todos/');
+        const data = await response.json();
+        todos.value = data;
       }
 
       watchEffect(() => {
           // console.log(todos.value.length)
           // console.log(todos.value)
 
-          localStorage.setItem('todos', JSON.stringify(todos.value))
+          loadData();
       })
   }
 

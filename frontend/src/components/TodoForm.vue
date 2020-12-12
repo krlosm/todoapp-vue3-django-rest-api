@@ -9,11 +9,32 @@
 </template>
 
 <script>
-import { inject, ref } from 'vue'
+import { inject, ref, watchEffect } from 'vue'
 export default {
     setup() {
         const todos = inject('todos')
         const texto = ref('')
+        
+        async function newTodo(todo) {
+
+            await fetch('http://127.0.0.1:8000/api/todos/', {
+                method: 'post',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(todo)
+            });
+            
+            todo = {};
+
+            loadData();
+        }
+
+        async function loadData() {
+            const response = await fetch('http://127.0.0.1:8000/api/todos/');
+            const data = await response.json();
+            todos.value = data;
+        }
         
         const formulario = () => {
             // console.log(texto.value)
@@ -28,11 +49,9 @@ export default {
                 id: Date.now(),
             }
 
-            todos.value.push(todo)
-            // console.log(todos.value)
+            newTodo(todo)
 
             texto.value = ''
-            // console.log(todo)
         }
 
         return { formulario, texto, }
